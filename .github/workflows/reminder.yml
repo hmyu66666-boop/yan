@@ -1,0 +1,94 @@
+name: 值班提醒
+
+on:
+  schedule:
+    # UTC 0-15点 = 北京8-23点，每30分钟
+    - cron: '0,30 0-15 * * *'
+
+jobs:
+  send-message:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 发送值班提醒
+        env:
+          WEBHOOK: ${{ secrets.WEBHOOK_URL }}
+        run: |
+          # 获取北京时间
+          HOUR=$(date +%H)
+          BJ_HOUR=$((10#$HOUR + 8))
+          if [ $BJ_HOUR -ge 24 ]; then BJ_HOUR=$((BJ_HOUR - 24)); fi
+          
+          # 获取日期（2月=02）
+          MONTH=$(date +%m)
+          DAY=$(date +%d)
+          TODAY="${MONTH}月${DAY}日"
+          
+          # ========== 排班表 ==========
+          # 上午班
+          if [ "$TODAY" = "02月12日" ]; then MORNING="于蕙铭"
+          elif [ "$TODAY" = "02月13日" ]; then MORNING="小B"
+          elif [ "$TODAY" = "02月14日" ]; then MORNING="小B"
+          elif [ "$TODAY" = "02月15日" ]; then MORNING="小B"
+          elif [ "$TODAY" = "02月16日" ]; then MORNING="小B"
+          elif [ "$TODAY" = "02月17日" ]; then MORNING="小B"
+          elif [ "$TODAY" = "02月18日" ]; then MORNING="小B"
+          elif [ "$TODAY" = "02月19日" ]; then MORNING="小B"
+          elif [ "$TODAY" = "02月20日" ]; then MORNING="小B"
+          elif [ "$TODAY" = "02月21日" ]; then MORNING="小B"
+          elif [ "$TODAY" = "02月22日" ]; then MORNING="小B"
+          elif [ "$TODAY" = "02月23日" ]; then MORNING="小B"
+          elif [ "$TODAY" = "02月24日" ]; then MORNING="小B"
+          elif [ "$TODAY" = "02月25日" ]; then MORNING="小B"
+          elif [ "$TODAY" = "02月26日" ]; then MORNING="小B"
+          elif [ "$TODAY" = "02月27日" ]; then MORNING="小B"
+          elif [ "$TODAY" = "02月28日" ]; then MORNING="小B"
+          else MORNING="暂无安排"
+          fi
+          
+          # 下午班
+          if [ "$TODAY" = "02月12日" ]; then AFTERNOON="于蕙铭"
+          elif [ "$TODAY" = "02月13日" ]; then AFTERNOON="小D"
+          elif [ "$TODAY" = "02月14日" ]; then AFTERNOON="小D"
+          elif [ "$TODAY" = "02月15日" ]; then AFTERNOON="小D"
+          elif [ "$TODAY" = "02月16日" ]; then AFTERNOON="小D"
+          elif [ "$TODAY" = "02月17日" ]; then AFTERNOON="小D"
+          elif [ "$TODAY" = "02月18日" ]; then AFTERNOON="小D"
+          elif [ "$TODAY" = "02月19日" ]; then AFTERNOON="小D"
+          elif [ "$TODAY" = "02月20日" ]; then AFTERNOON="小D"
+          elif [ "$TODAY" = "02月21日" ]; then AFTERNOON="小D"
+          elif [ "$TODAY" = "02月22日" ]; then AFTERNOON="小D"
+          elif [ "$TODAY" = "02月23日" ]; then AFTERNOON="小D"
+          elif [ "$TODAY" = "02月24日" ]; then AFTERNOON="小D"
+          elif [ "$TODAY" = "02月25日" ]; then AFTERNOON="小D"
+          elif [ "$TODAY" = "02月26日" ]; then AFTERNOON="小D"
+          elif [ "$TODAY" = "02月27日" ]; then AFTERNOON="小D"
+          elif [ "$TODAY" = "02月28日" ]; then AFTERNOON="小D"
+          
+          else AFTERNOON="暂无安排"
+          fi
+          # ===========================
+          
+          # 判断时段并发送
+          if [ $BJ_HOUR -ge 8 ] && [ $BJ_HOUR -lt 17 ]; then
+            if [ "$MORNING" = "暂无安排" ]; then
+              echo "今天上午无安排，跳过"
+              exit 0
+            fi
+            MSG="【上午班提醒】\n日期：@${TODAY}\n值班：${MORNING}\n请确认收到"
+            
+          elif [ $BJ_HOUR -ge 17 ] && [ $BJ_HOUR -lt 24 ]; then
+            if [ "$AFTERNOON" = "暂无安排" ]; then
+              echo "今天下午无安排，跳过"
+              exit 0
+            fi
+            MSG="【下午班提醒】\n日期：@${TODAY}\n值班：${AFTERNOON}\n请确认收到"
+            
+          else
+            echo "非工作时间"
+            exit 0
+          fi
+          
+          # 发送
+          curl "$WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d "{\"msgtype\":\"text\",\"text\":{\"content\":\"${MSG}\"}}"
