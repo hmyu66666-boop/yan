@@ -47,7 +47,7 @@ jobs:
           fi
           
           # 下午班
-          if [ "$TODAY" = "02月12日" ]; then AFTERNOON="于蕙铭"
+          if [ "$TODAY" = "02月12日" ]; then AFTERNOON="huimingyu@xiaohongshu.net"
           elif [ "$TODAY" = "02月13日" ]; then AFTERNOON="小D"
           elif [ "$TODAY" = "02月14日" ]; then AFTERNOON="小G"
           elif [ "$TODAY" = "02月15日" ]; then AFTERNOON=""
