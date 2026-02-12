@@ -3,7 +3,8 @@ name: 值班提醒
 on:
   schedule:
     # UTC 0-15点 = 北京8-23点，每30分钟
-    - cron: '0,30 0-15 * * *'
+    - cron: '0,30 8-23 * * *'
+  workflow_dispatch:
 
 jobs:
   send-message:
