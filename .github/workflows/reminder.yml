@@ -16,4 +16,4 @@ jobs:
           # 简化版：直接发送测试
           curl "$WEBHOOK" \
             -H "Content-Type: application/json" \
-            -d '{"msgtype":"text","text":{"content":"测试消息"}}'
+            -d '{"msgtype":"text","text":{"content":"@于蕙铭"}}'
